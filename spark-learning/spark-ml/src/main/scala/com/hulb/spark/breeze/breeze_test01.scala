@@ -3,7 +3,6 @@ package com.hulb.spark.breeze
 /**
   * Created by hulb on 17/4/8.
   */
-
 import org.apache.log4j.{ Level, Logger }
 import org.apache.spark.{ SparkConf, SparkContext }
 import breeze.linalg._
@@ -123,7 +122,7 @@ object breeze_test01 {
     ceil(a_7)
     floor(a_7)
     signum(a_7)
-    abs(a_7)
+    println(abs(a_7))
 
   }
 }
