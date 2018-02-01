@@ -10,10 +10,13 @@ package com.hulb.java.jvm;
  * 堆内存分配：
  * -Xms:初始堆大小
  * -Xmx:最大堆大小
+ *
+ * 最小和最大 推荐设置成一样大,防止扩容造成不良影响
+ *
  * -XX:NewSize=n:设置年轻代大小
- * -XX:NewRatio=n:设置年轻代和年老代的比值。如:为3，表示年轻代与年老代比值为1：3，年轻代占整个年轻代年老代和的1/4
+ * -XX:NewRatio=n:设置年轻代和年老代的比值。如:为3，表示年轻代与年老代比值为1：3，年轻代占整个年轻代年老代和的1/4 这里有坑:详见：
  * -XX:SurvivorRatio=n:年轻代中Eden区与两个Survivor区的比值。注意Survivor区有两个。如：3，表示Eden：Survivor=3：2，一个Survivor区占整个年轻代的1/5
- * -XX:MaxPermSize=n:设置持久代大小
+ * -XX:MaxPermSize=n:设置持久代大小（JDK8 开始没有永久代 而是metaspace）
  *
  * 这个：
  * –Xmn1536m 设置年轻代区域大小为 1536m；
