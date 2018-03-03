@@ -1,6 +1,4 @@
 
-
-
 grammar LabeledExpr;
 
 @header {
