@@ -18,7 +18,7 @@ public class TwinsLock implements Lock {
     /**
      * 方法获取锁，随后调用unlock()方法释放锁，而同一时刻只能有两个线程同时获取到锁。
      */
-    private final Sync sync = new Sync(3);
+    private final Sync sync = new Sync(2);
 
     /**
      * 一个自定义的同步器。以共享式获取同步状态，同步器会先计算出获取后的同步状态，然后通过CAS确保状态
@@ -35,15 +35,28 @@ public class TwinsLock implements Lock {
 
         /**
          * 状态大于0的时候，表示获取到锁。
+         *
          * @param reduceCount
          * @return
          */
         @Override
         public int tryAcquireShared(int reduceCount) {
             for (; ; ) {
+                /**
+                 * 第一次进入时 current =2
+                 * reduceCount=1
+                 *
+                 * 那么newCount = 2-1 = 1
+                 *
+                 * 需要将当前的current（2） 设置为 newCount（1） 设置成功返回 newCount
+                 * 如果newCount >=0 那么 就获取锁成功!
+                 */
                 int current = getState();
                 int newCount = current - reduceCount;
-                if (compareAndSetState(current, newCount)) {
+                /**
+                 * 这里 newCount<0 。代表：？？？
+                 */
+                if (newCount < 0 || compareAndSetState(current, newCount)) {
                     return newCount;
                 }
             }
@@ -64,7 +77,25 @@ public class TwinsLock implements Lock {
 
     @Override
     public void lock() {
+        /**
+         * 获得锁。
+         *
+         */
         sync.acquireShared(1);
+    }
+
+    @Override
+    public void unlock() {
+        /**
+         * 释放锁：
+         *
+         */
+        sync.releaseShared(1);
+    }
+
+    @Override
+    public Condition newCondition() {
+        return null;
     }
 
     @Override
@@ -80,15 +111,5 @@ public class TwinsLock implements Lock {
     @Override
     public boolean tryLock(long time, TimeUnit unit) throws InterruptedException {
         return false;
-    }
-
-    @Override
-    public void unlock() {
-        sync.releaseShared(1);
-    }
-
-    @Override
-    public Condition newCondition() {
-        return null;
     }
 }

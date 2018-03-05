@@ -17,7 +17,7 @@ public class TwinsLockTest {
                     lock.lock();
                     try {
                         SleepUtils.second(1);
-                        System.out.println(Thread.currentThread().getName());
+                        System.out.println("::"+Thread.currentThread().getName());
                         SleepUtils.second(1);
                     } finally {
                         lock.unlock();
@@ -36,10 +36,36 @@ public class TwinsLockTest {
         // 每隔1秒换行
         for (int i = 0; i < 10; i++) {
             SleepUtils.second(1);
-            System.out.println();
+            System.out.println("------------------"+i);
         }
     }
+    /**
+
+
+     打印结果：
+
+     ::Thread-1
+     ::Thread-0
+     ------------------0
+     ------------------1
+     ::Thread-0
+     ::Thread-1
+     ------------------2
+     ------------------3
+     ::Thread-1
+     ::Thread-0
+     ------------------4
+     ------------------5
+     ::Thread-0
+     ::Thread-1
+     ------------------6
+     ------------------7
+     ::Thread-1
+     ::Thread-0
+     ------------------8
+     */
 }
+
 
 
 
