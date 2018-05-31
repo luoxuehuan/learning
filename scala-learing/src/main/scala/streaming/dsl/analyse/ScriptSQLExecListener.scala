@@ -16,7 +16,7 @@ class ScriptSQLExecListener (str:String,str2:String) extends DSLSQLListener{
   override def exitSql(ctx: DSLSQLParser.SqlContext): Unit = {
 
     ctx.getChild(0).getText.toLowerCase() match {
-      case "create" =>
+      case "create source stream" =>
         new CreateAdaptor(this).parse(ctx)
       case "connect" =>
         new ConnectAdaptor(this).parse(ctx)
@@ -363,4 +363,18 @@ class ScriptSQLExecListener (str:String,str2:String) extends DSLSQLListener{
     * @param ctx the parse tree
     */
   override def exitDataType(ctx: DSLSQLParser.DataTypeContext): Unit = {}
+
+  /**
+    * Enter a parse tree produced by {@link DSLSQLParser#optionList}.
+    *
+    * @param ctx the parse tree
+    */
+  override def enterOptionList(ctx: DSLSQLParser.OptionListContext): Unit = {}
+
+  /**
+    * Exit a parse tree produced by {@link DSLSQLParser#optionList}.
+    *
+    * @param ctx the parse tree
+    */
+  override def exitOptionList(ctx: DSLSQLParser.OptionListContext): Unit = {}
 }

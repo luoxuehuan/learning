@@ -40,6 +40,16 @@ public interface DSLSQLListener extends ParseTreeListener {
 	 */
 	void exitColTypeList(DSLSQLParser.ColTypeListContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link DSLSQLParser#optionList}.
+	 * @param ctx the parse tree
+	 */
+	void enterOptionList(DSLSQLParser.OptionListContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link DSLSQLParser#optionList}.
+	 * @param ctx the parse tree
+	 */
+	void exitOptionList(DSLSQLParser.OptionListContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link DSLSQLParser#colType}.
 	 * @param ctx the parse tree
 	 */

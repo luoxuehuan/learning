@@ -7,6 +7,7 @@ package streaming.dsl.parser;
 
 //load jdbc.`mysql1.tb_v_user` as mysql_tb_user;
 //save csv_input_result as json.`/tmp/todd/result_json` partitionBy uid;
+//   --  | ('create'|'CREATE') ~(';')*
 statement
     : (sql ender)*
     ;
@@ -17,7 +18,7 @@ sql
     | ('save'|'SAVE') (overwrite | append | errorIfExists |ignore)* tableName 'as' format '.' path 'options'? expression? booleanExpression* ('partitionBy' col)?
     | ('select'|'SELECT') ~(';')* 'as' tableName
     | ('insert'|'INSERT') ~(';')*
-    | ('create'|'CREATE') ~(';')*
+    | ('create source stream'|'CREATE SOURCE STREAM') tableName ('(' colTypeList ')')? 'option'? ('(' optionList ')')?
     | ('set'|'SET') setKey '=' setValue
     | ('connect'|'CONNECT') format ('(' colTypeList ')')? 'where'? expression? booleanExpression* ('as' db)?
     | ('source'|'SOURCE') format 'where'? expression? booleanExpression* ('as' db)?
@@ -29,6 +30,10 @@ sql
 
 colTypeList
     : colType (',' colType)*
+    ;
+
+optionList
+    : expression (',' expression)*
     ;
 
 //列结构
