@@ -14,26 +14,37 @@ statement
 
 sql
     : ('load'|'LOAD') format '.' path 'options'? expression? booleanExpression*  'as' tableName
-    | ('CREATE'|'create') (source | sink)* tableName 'options'? expression? booleanExpression*
     | ('save'|'SAVE') (overwrite | append | errorIfExists |ignore)* tableName 'as' format '.' path 'options'? expression? booleanExpression* ('partitionBy' col)?
     | ('select'|'SELECT') ~(';')* 'as' tableName
     | ('insert'|'INSERT') ~(';')*
     | ('create'|'CREATE') ~(';')*
-    | ('set'|'SET') setKey '=' setValue 'options'? expression? booleanExpression*
-    | ('connect'|'CONNECT') format 'where'? expression? booleanExpression* ('as' db)?
+    | ('set'|'SET') setKey '=' setValue
+    | ('connect'|'CONNECT') format ('(' colTypeList ')')? 'where'? expression? booleanExpression* ('as' db)?
+    | ('source'|'SOURCE') format 'where'? expression? booleanExpression* ('as' db)?
+    | ('train'|'TRAIN') tableName 'as' format '.' path 'where'? expression? booleanExpression*
+    | ('register'|'REGISTER') format '.' path 'as' functionName
     |  SIMPLE_COMMENT
     ;
 
+
+colTypeList
+    : colType (',' colType)*
+    ;
+
+//列结构
+colType
+    : identifier dataType (COMMENT STRING)?
+    ;
+
+//数据类型
+dataType
+    : identifier
+    ;
+
+COMMENT: 'COMMENT';
+
 overwrite
     : 'overwrite'
-    ;
-
-source
-    : 'source'
-    ;
-
-sink
-    : 'sink'
     ;
 
 append
@@ -69,11 +80,11 @@ path
     ;
 
 setValue
-    : qualifiedName | quotedIdentifier | STRING
+    : quotedIdentifier | STRING
     ;
 
 setKey
-    : qualifiedName
+    : identifier
     ;
 
 db
@@ -81,10 +92,6 @@ db
     ;
 
 tableName
-    : identifier
-    ;
-
-streamName
     : identifier
     ;
 
