@@ -5,8 +5,7 @@ import java.util
 import streaming.dsl.analyse.{DslAdaptor, ScriptSQLExecListener}
 import streaming.dsl.parser.DSLSQLParser._
 
-class SourceAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdaptor {
-
+class SinkAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdaptor {
   override def parse(ctx: SqlContext): Unit = {
 
     var streamName = ""

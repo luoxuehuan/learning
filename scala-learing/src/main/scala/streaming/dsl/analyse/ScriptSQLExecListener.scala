@@ -2,7 +2,7 @@ package streaming.dsl.analyse
 
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.tree.{ErrorNode, TerminalNode}
-import streaming.dsl.analyse.adaptor.ConnectAdaptor
+import streaming.dsl.analyse.adaptor.{ConnectAdaptor, SinkAdaptor, SourceAdaptor}
 import streaming.dsl.parser.{DSLSQLListener, DSLSQLParser}
 
 
@@ -17,7 +17,9 @@ class ScriptSQLExecListener (str:String,str2:String) extends DSLSQLListener{
 
     ctx.getChild(0).getText.toLowerCase() match {
       case "create source stream" =>
-        new CreateAdaptor(this).parse(ctx)
+        new SourceAdaptor(this).parse(ctx)
+      case "create sink stream" =>
+        new SinkAdaptor(this).parse(ctx)
       case "connect" =>
         new ConnectAdaptor(this).parse(ctx)
     }

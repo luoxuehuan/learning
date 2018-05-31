@@ -19,6 +19,7 @@ sql
     | ('select'|'SELECT') ~(';')* 'as' tableName
     | ('insert'|'INSERT') ~(';')*
     | ('create source stream'|'CREATE SOURCE STREAM') tableName ('(' colTypeList ')')? 'option'? ('(' optionList ')')?
+    | ('create sink stream'|'CREATE SINK STREAM') tableName ('(' colTypeList ')')? 'option'? ('(' optionList ')')?
     | ('set'|'SET') setKey '=' setValue
     | ('connect'|'CONNECT') format ('(' colTypeList ')')? 'where'? expression? booleanExpression* ('as' db)?
     | ('source'|'SOURCE') format 'where'? expression? booleanExpression* ('as' db)?
