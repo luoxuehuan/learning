@@ -8,7 +8,7 @@ class ConnectAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAd
 
     var option = Map[String, String]()
     var dbName = ""
-
+    println("\n字段信息：")
     (0 to ctx.getChildCount() - 1).foreach { tokenIndex =>
       ctx.getChild(tokenIndex) match {
         case s: FormatContext =>
@@ -37,7 +37,13 @@ class ConnectAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAd
       }
     }
 
-    println("source配置项："+option)
-    println("注册为表:"+dbName)
+    println("\nsource配置项：")
+    option.foreach{value => {
+        print(value._1)
+        print("=>")
+        println(value._2)
+      }
+    }
+    println("\n注册为表:"+dbName)
   }
 }
