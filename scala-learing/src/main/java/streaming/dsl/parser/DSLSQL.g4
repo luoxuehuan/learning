@@ -14,17 +14,9 @@ statement
 
 
 sql
-    : ('load'|'LOAD') format '.' path 'options'? expression? booleanExpression*  'as' tableName
-    | ('save'|'SAVE') (overwrite | append | errorIfExists |ignore)* tableName 'as' format '.' path 'options'? expression? booleanExpression* ('partitionBy' col)?
-    | ('select'|'SELECT') ~(';')* 'as' tableName
-    | ('insert'|'INSERT') ~(';')*
+    :
     | ('create source stream'|'CREATE SOURCE STREAM') tableName ('(' colTypeList ')')? 'option'? ('(' optionList ')')?
     | ('create sink stream'|'CREATE SINK STREAM') tableName ('(' colTypeList ')')? 'option'? ('(' optionList ')')?
-    | ('set'|'SET') setKey '=' setValue
-    | ('connect'|'CONNECT') format ('(' colTypeList ')')? 'where'? expression? booleanExpression* ('as' db)?
-    | ('source'|'SOURCE') format 'where'? expression? booleanExpression* ('as' db)?
-    | ('train'|'TRAIN') tableName 'as' format '.' path 'where'? expression? booleanExpression*
-    | ('register'|'REGISTER') format '.' path 'as' functionName
     |  SIMPLE_COMMENT
     ;
 

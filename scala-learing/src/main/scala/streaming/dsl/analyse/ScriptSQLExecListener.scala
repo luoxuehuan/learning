@@ -7,25 +7,6 @@ import streaming.dsl.parser.{DSLSQLListener, DSLSQLParser}
 
 
 class ScriptSQLExecListener (str:String,str2:String) extends DSLSQLListener{
-
-  /**
-    * Exit a parse tree produced by {@link DSLSQLParser#sql}.
-    *
-    * @param ctx the parse tree
-    */
-  override def exitSql(ctx: DSLSQLParser.SqlContext): Unit = {
-
-    ctx.getChild(0).getText.toLowerCase() match {
-      case "create source stream" =>
-        new SourceAdaptor(this).parse(ctx)
-      case "create sink stream" =>
-        new SinkAdaptor(this).parse(ctx)
-      case "connect" =>
-        new ConnectAdaptor(this).parse(ctx)
-    }
-  }
-
-
   /**
     * Enter a parse tree produced by {@link DSLSQLParser#statement}.
     *
@@ -47,6 +28,76 @@ class ScriptSQLExecListener (str:String,str2:String) extends DSLSQLListener{
     */
   override def enterSql(ctx: DSLSQLParser.SqlContext): Unit = {}
 
+  /**
+    * Exit a parse tree produced by {@link DSLSQLParser#sql}.
+    *
+    * @param ctx the parse tree
+    */
+  override def exitSql(ctx: DSLSQLParser.SqlContext): Unit = {
+
+    ctx.getChild(0).getText.toLowerCase() match {
+      case "create source stream" =>
+        new SourceAdaptor(this).parse(ctx)
+      case "create sink stream" =>
+        new SinkAdaptor(this).parse(ctx)
+      case  _ => println("sql not match")
+    }
+  }
+  /**
+    * Enter a parse tree produced by {@link DSLSQLParser#colTypeList}.
+    *
+    * @param ctx the parse tree
+    */
+  override def enterColTypeList(ctx: DSLSQLParser.ColTypeListContext): Unit = {}
+
+  /**
+    * Exit a parse tree produced by {@link DSLSQLParser#colTypeList}.
+    *
+    * @param ctx the parse tree
+    */
+  override def exitColTypeList(ctx: DSLSQLParser.ColTypeListContext): Unit = {}
+
+  /**
+    * Enter a parse tree produced by {@link DSLSQLParser#optionList}.
+    *
+    * @param ctx the parse tree
+    */
+  override def enterOptionList(ctx: DSLSQLParser.OptionListContext): Unit = {}
+
+  /**
+    * Exit a parse tree produced by {@link DSLSQLParser#optionList}.
+    *
+    * @param ctx the parse tree
+    */
+  override def exitOptionList(ctx: DSLSQLParser.OptionListContext): Unit = {}
+
+  /**
+    * Enter a parse tree produced by {@link DSLSQLParser#colType}.
+    *
+    * @param ctx the parse tree
+    */
+  override def enterColType(ctx: DSLSQLParser.ColTypeContext): Unit = {}
+
+  /**
+    * Exit a parse tree produced by {@link DSLSQLParser#colType}.
+    *
+    * @param ctx the parse tree
+    */
+  override def exitColType(ctx: DSLSQLParser.ColTypeContext): Unit = {}
+
+  /**
+    * Enter a parse tree produced by {@link DSLSQLParser#dataType}.
+    *
+    * @param ctx the parse tree
+    */
+  override def enterDataType(ctx: DSLSQLParser.DataTypeContext): Unit = {}
+
+  /**
+    * Exit a parse tree produced by {@link DSLSQLParser#dataType}.
+    *
+    * @param ctx the parse tree
+    */
+  override def exitDataType(ctx: DSLSQLParser.DataTypeContext): Unit = {}
 
   /**
     * Enter a parse tree produced by {@link DSLSQLParser#overwrite}.
@@ -230,8 +281,6 @@ class ScriptSQLExecListener (str:String,str2:String) extends DSLSQLListener{
     */
   override def exitTableName(ctx: DSLSQLParser.TableNameContext): Unit = {}
 
-
-
   /**
     * Enter a parse tree produced by {@link DSLSQLParser#functionName}.
     *
@@ -323,60 +372,4 @@ class ScriptSQLExecListener (str:String,str2:String) extends DSLSQLListener{
   override def visitErrorNode(node: ErrorNode): Unit = {}
 
   override def visitTerminal(node: TerminalNode): Unit = {}
-
-  /**
-    * Enter a parse tree produced by {@link DSLSQLParser#colTypeList}.
-    *
-    * @param ctx the parse tree
-    */
-  override def enterColTypeList(ctx: DSLSQLParser.ColTypeListContext): Unit = {}
-
-  /**
-    * Exit a parse tree produced by {@link DSLSQLParser#colTypeList}.
-    *
-    * @param ctx the parse tree
-    */
-  override def exitColTypeList(ctx: DSLSQLParser.ColTypeListContext): Unit = {}
-
-  /**
-    * Enter a parse tree produced by {@link DSLSQLParser#colType}.
-    *
-    * @param ctx the parse tree
-    */
-  override def enterColType(ctx: DSLSQLParser.ColTypeContext): Unit = {}
-
-  /**
-    * Exit a parse tree produced by {@link DSLSQLParser#colType}.
-    *
-    * @param ctx the parse tree
-    */
-  override def exitColType(ctx: DSLSQLParser.ColTypeContext): Unit = {}
-
-  /**
-    * Enter a parse tree produced by {@link DSLSQLParser#dataType}.
-    *
-    * @param ctx the parse tree
-    */
-  override def enterDataType(ctx: DSLSQLParser.DataTypeContext): Unit = {}
-
-  /**
-    * Exit a parse tree produced by {@link DSLSQLParser#dataType}.
-    *
-    * @param ctx the parse tree
-    */
-  override def exitDataType(ctx: DSLSQLParser.DataTypeContext): Unit = {}
-
-  /**
-    * Enter a parse tree produced by {@link DSLSQLParser#optionList}.
-    *
-    * @param ctx the parse tree
-    */
-  override def enterOptionList(ctx: DSLSQLParser.OptionListContext): Unit = {}
-
-  /**
-    * Exit a parse tree produced by {@link DSLSQLParser#optionList}.
-    *
-    * @param ctx the parse tree
-    */
-  override def exitOptionList(ctx: DSLSQLParser.OptionListContext): Unit = {}
 }
