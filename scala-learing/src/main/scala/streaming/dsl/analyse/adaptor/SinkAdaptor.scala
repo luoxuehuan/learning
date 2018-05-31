@@ -14,10 +14,6 @@ class SinkAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdapt
 
 
     (0 to ctx.getChildCount() - 1).foreach { tokenIndex =>
-
-      //println("===="+tokenIndex)
-      //println(ctx.getChild(tokenIndex).getText)
-
       ctx.getChild(tokenIndex) match {
         case s: TableNameContext =>
           streamName = s.getText
@@ -28,7 +24,6 @@ class SinkAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdapt
                 val colName = colxtx.identifier().getText
                 val colType = colxtx.dataType().getText
                 cols.put(colName,colType)
-                //println("字段名称:"+colName +" 字段类型:"+colType)
               }
               case _ =>
             }
@@ -43,7 +38,6 @@ class SinkAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdapt
                 val optionKey = colxtx.identifier().getText
                 val optionValue = colxtx.STRING().getText
                 options.put(optionKey,optionValue)
-                //println("option名称:"+optionKey +" 字段类型:"+optionValue)
               }
               case _ =>
             }
@@ -54,8 +48,8 @@ class SinkAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAdapt
       }
     }
 
-    println("\n注册为表:"+streamName)
-    println("\n字段配置:"+cols)
-    println("\n参数配置:"+options)
+    println("\n注册为sink表:"+streamName)
+    println("\nsink字段配置:"+cols)
+    println("\nsink参数配置:"+options)
   }
 }

@@ -10,26 +10,20 @@ class SourceAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAda
   override def parse(ctx: SqlContext): Unit = {
 
     var streamName = ""
-    val options = new util.HashMap[String,String]
-    val cols = new util.HashMap[String,String]
-
+    val options = new util.HashMap[String, String]
+    val cols = new util.HashMap[String, String]
 
     (0 to ctx.getChildCount() - 1).foreach { tokenIndex =>
-
-      //println("===="+tokenIndex)
-      //println(ctx.getChild(tokenIndex).getText)
-
       ctx.getChild(tokenIndex) match {
         case s: TableNameContext =>
           streamName = s.getText
-        case s: ColTypeListContext =>{
-          (0 to s.getChildCount() - 1).foreach{ colIndex => {
+        case s: ColTypeListContext => {
+          (0 to s.getChildCount() - 1).foreach { colIndex => {
             s.getChild(colIndex) match {
-              case colxtx:ColTypeContext => {
+              case colxtx: ColTypeContext => {
                 val colName = colxtx.identifier().getText
                 val colType = colxtx.dataType().getText
-                cols.put(colName,colType)
-                //println("字段名称:"+colName +" 字段类型:"+colType)
+                cols.put(colName, colType)
               }
               case _ =>
             }
@@ -37,14 +31,13 @@ class SourceAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAda
           }
         }
 
-        case s: OptionListContext =>{
-          (0 to s.getChildCount() - 1).foreach{ colIndex => {
+        case s: OptionListContext => {
+          (0 to s.getChildCount() - 1).foreach { colIndex => {
             s.getChild(colIndex) match {
-              case colxtx:ExpressionContext => {
+              case colxtx: ExpressionContext => {
                 val optionKey = colxtx.identifier().getText
                 val optionValue = colxtx.STRING().getText
-                options.put(optionKey,optionValue)
-                //println("option名称:"+optionKey +" 字段类型:"+optionValue)
+                options.put(optionKey, optionValue)
               }
               case _ =>
             }
@@ -55,8 +48,8 @@ class SourceAdaptor(scriptSQLExecListener: ScriptSQLExecListener) extends DslAda
       }
     }
 
-    println("\n注册为表:"+streamName)
-    println("\n字段配置:"+cols)
-    println("\n参数配置:"+options)
+    println("\n注册为source表:" + streamName)
+    println("\nsource字段配置:" + cols)
+    println("\nsource参数配置:" + options)
   }
 }
