@@ -41,25 +41,6 @@ dataType
 
 COMMENT: 'COMMENT';
 
-overwrite
-    : 'overwrite'
-    ;
-
-append
-    : 'append'
-    ;
-
-errorIfExists
-    : 'errorIfExists'
-    ;
-
-ignore
-    : 'ignore'
-    ;
-
-booleanExpression
-    : 'and' expression
-    ;
 
 expression
     : identifier '=' STRING
@@ -69,40 +50,9 @@ ender
     :';'
     ;
 
-format
-    : identifier
-    ;
-
-path
-    : quotedIdentifier | identifier
-    ;
-
-setValue
-    : quotedIdentifier | STRING
-    ;
-
-setKey
-    : identifier
-    ;
-
-db
-    :qualifiedName | identifier
-    ;
 
 tableName
     : identifier
-    ;
-
-functionName
-    : identifier
-    ;
-
-col
-    : identifier
-    ;
-
-qualifiedName
-    : identifier ('.' identifier)*
     ;
 
 identifier
