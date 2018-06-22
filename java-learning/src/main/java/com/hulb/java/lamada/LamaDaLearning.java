@@ -2,6 +2,7 @@ package com.hulb.java.lamada;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -25,4 +26,40 @@ public class LamaDaLearning {
 
         integerList1.stream().forEach(System.out::println);
     }
+
+
+
+    public static void list2map(){
+        List<Abc> integerList = new ArrayList<>();
+
+        //key重复会报错
+        Map<String,String> map = integerList
+                .stream()
+                .collect(Collectors.toMap(Abc::getA,Abc::getB));
+
+        //map.forEach(System.out::println());
+    }
+}
+
+
+class Abc{
+    private String a;
+
+    public String getA() {
+        return a;
+    }
+
+    public void setA(String a) {
+        this.a = a;
+    }
+
+    public String getB() {
+        return b;
+    }
+
+    public void setB(String b) {
+        this.b = b;
+    }
+
+    private String b;
 }
