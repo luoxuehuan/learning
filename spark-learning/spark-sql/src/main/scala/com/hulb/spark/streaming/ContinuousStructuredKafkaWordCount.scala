@@ -110,7 +110,7 @@ object ContinuousStructuredKafkaWordCount {
       .option("topic", "result")
       .option("checkpointLocation", checkpointLocation)
 
-      .trigger(Trigger.Continuous("1 second")) // only change in query
+      //.trigger(Trigger.Continuous("1 second")) // only change in query
       //.trigger( Trigger.ProcessingTime("5 seconds")) // only change in query
       .start()
 
