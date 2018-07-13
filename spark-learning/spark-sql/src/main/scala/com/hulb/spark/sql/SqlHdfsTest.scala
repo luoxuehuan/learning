@@ -25,6 +25,9 @@ object SqlHdfsTest {
     enhancer.setCallback(cglibProxy) //回调对象
     enhancer.create()
 
+    System.setProperty("dsds","dsafas")
+    System.getProperty("kl")
+
     import spark.sql
     sql(
       """

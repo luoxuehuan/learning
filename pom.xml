@@ -24,6 +24,7 @@
         <dtwave.common.version>1.1.2</dtwave.common.version>
         <odps.version>0.20.7-public</odps.version>
         <oss.sdk.version>2.2.0</oss.sdk.version>
+        <jackson.version>1.9.13</jackson.version>
     </properties>
 
     <dependencyManagement>
