@@ -57,18 +57,24 @@ object DealFlowBills2 {
       *
       * 原来可以执行topic，和offsets消费偏移度，这下派上用场了
       *
-      *
-      *
       */
+
+    //TODO 如果某个分区挂掉了怎么调整????Leader切换了！
     val stream = if (zk.znodeIsExists(s"${topic}offset")) {
-      val nor = zk.znodeDataGet(s"${topic}offset")
-      val newOffset = Map(new TopicPartition(nor(0).toString, nor(1).toInt) -> nor(2).toLong)//创建以topic，分区为k 偏移度为v的map
-      println(s"[ DealFlowBills2 ] --------------------------------------------------------------------")
-      println(s"[ DealFlowBills2 ] topic ${nor(0).toString}")
-      println(s"[ DealFlowBills2 ] Partition ${nor(1).toInt}")
-      println(s"[ DealFlowBills2 ] offset ${nor(2).toLong}")
-      println(s"[ DealFlowBills2 ] zk中取出来的kafka偏移量★★★ $newOffset")
-      println(s"[ DealFlowBills2 ] --------------------------------------------------------------------")
+
+      var newOffset: Map[TopicPartition, Long] = Map()
+      val childCount = zk.znodeIsCountChild(s"${topic}offset").size()
+      for (i <- 0 until childCount) {
+        val nor = zk.znodeDataGet(s"${topic}offset/$i")
+        newOffset  += (new TopicPartition(nor(0).toString, nor(1).toInt) -> nor(2).toLong)
+        //val newOffset = Map(new TopicPartition(nor(0).toString, nor(1).toInt) -> nor(2).toLong)//创建以topic，分区为k 偏移度为v的map
+        println(s"[ DealFlowBills2 ] --------------------------------------------------------------------")
+        println(s"[ DealFlowBills2 ] topic ${nor(0).toString}")
+        println(s"[ DealFlowBills2 ] Partition ${nor(1).toInt}")
+        println(s"[ DealFlowBills2 ] offset ${nor(2).toLong}")
+        println(s"[ DealFlowBills2 ] zk中取出来的kafka偏移量★★★ $newOffset")
+        println(s"[ DealFlowBills2 ] --------------------------------------------------------------------")
+      }
       KafkaUtils.createDirectStream[String, String](ssc, PreferConsistent, Subscribe[String, String](topics, kafkaParams, newOffset))
     } else {
       println(s"[ DealFlowBills2 ] --------------------------------------------------------------------")
@@ -76,6 +82,7 @@ object DealFlowBills2 {
       println(s"[ DealFlowBills2 ] 手动创建一个偏移量文件 ${topic}offset 默认从0号分区 0偏移度开始计算")
       println(s"[ DealFlowBills2 ] --------------------------------------------------------------------")
       zk.znodeCreate(s"${topic}offset", s"$topic,0,0")
+      zk.znodeCreate(s"${topic}offset/0", s"$topic,0,0")
       val nor = zk.znodeDataGet(s"${topic}offset")
       val newOffset = Map(new TopicPartition(nor(0).toString, nor(1).toInt) -> nor(2).toLong)
       KafkaUtils.createDirectStream[String, String](ssc, PreferConsistent, Subscribe[String, String](topics, kafkaParams, newOffset))
@@ -87,30 +94,6 @@ object DealFlowBills2 {
       */
     val lines = stream.map(_.value())
     lines.print()
-
-    val result = lines
-//    val result = lines
-//      .filter(_.split(",").length == 21)
-//      .map {
-//        mlines =>
-//          val line = mlines.split(",")
-//          (line(3), s"${line(4)},${line(2)}")
-//      }
-//      .groupByKey()
-//      .map {
-//        case (k, v) =>
-//          val result = v
-//            .flatMap {
-//              fmlines =>
-//                fmlines.split(",").toList.zipWithIndex
-//            }
-//            .groupBy(_._2)
-//            .map {
-//              case (v1, v2) =>
-//                v2.map(_._1)
-//            }
-//          (k, result)
-//      }
 
     /** ***************************************************************************************************************
       * todo 4 - 保存偏移度部分
@@ -128,8 +111,10 @@ object DealFlowBills2 {
             println(s"[ DealFlowBills2 ]  fromOffset 开始偏移量: ${o.fromOffset} ")
             println(s"[ DealFlowBills2 ]  untilOffset 结束偏移量: ${o.untilOffset} 需要保存的偏移量,供下次读取使用★★★")
             println(s"[ DealFlowBills2 ] --------------------------------------------------------------------")
-            // 写zookeeper
-            zk.offsetWork(s"${o.topic}offset", s"${o.topic},${o.partition},${o.untilOffset}")
+
+            // 每个patition都需要, 写zookeeper, 现在这个版本是有bug的。 patition 1 会把 patition 0 给覆盖掉
+            zk.offsetWork(s"${o.topic}offset/${o.partition}", s"${o.topic},${o.partition},${o.untilOffset}")
+            //zk.offsetWork(s"${o.topic}offset/${o.partition}", s"${o.topic},${o.partition},${o.untilOffset}")
 
           // 写本地文件系统
           // val fw = new FileWriter(new File("/home/hadoop1/testjar/test.log"), true)
@@ -137,11 +122,6 @@ object DealFlowBills2 {
           // fw.close()
         }
     }
-
-    /** ***************************************************************************************************************
-      * todo 5 - 最后结果操作部分
-      */
-    result.saveAsTextFiles(output + s"/output/" + "010")
 
     /** ***************************************************************************************************************
       * todo spark streaming 开始工作

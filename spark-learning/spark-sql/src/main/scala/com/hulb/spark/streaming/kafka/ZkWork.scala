@@ -1,6 +1,9 @@
 package com.hulb.spark.streaming.kafka
 
 
+import java.util
+import java.util.List
+
 import org.apache.zookeeper.ZooDefs.Ids
 import org.apache.zookeeper.{CreateMode, WatchedEvent, Watcher, ZooKeeper}
 
@@ -27,6 +30,7 @@ object ZkWork {
     println(s"[ ZkWork ] zk create /$znode , $data")
     zooKeeper.create(s"/$znode", data.getBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT)
   }
+
 
   def znodeDataSet(znode: String, data: String) {
     println(s"[ ZkWork ] zk data set /$znode")
@@ -56,6 +60,13 @@ object ZkWork {
       case null => false
       case _ => true
     }
+  }
+
+  def znodeIsCountChild(znode: String): util.List[String] ={
+    connect()
+    println(s"[ ZkWork ] zk znode is exists /$znode")
+    val childs = zooKeeper.getChildren(s"/$znode", true)
+    childs
   }
 
   def offsetWork(znode: String, data: String) {
