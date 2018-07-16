@@ -37,7 +37,7 @@ public class LamaDaLearning {
                 .stream()
                 .collect(Collectors.toMap(Abc::getA, Abc::getB));
 
-        map.forEach(System.out::println);
+        //map.forEach(System.out::println);
     }
 }
 
