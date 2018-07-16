@@ -29,9 +29,10 @@ import kafka.api.TopicMetadataRequest
   */
 object StreamingFromKafka {
   val groupId = "logs"
-  val topic = "streaming"
+  val topic = "orders"
 
-  val zkClient = new ZkClient("localhost:9999", 60000, 60000, new ZkSerializer {
+  val zkClient = new ZkClient("mq250:2181,mq164:2181,mq221:2181", 60000, 60000, new ZkSerializer {
+
     override def serialize(data: Object): Array[Byte] = {
       try {
         return data.toString().getBytes("UTF-8")
@@ -57,15 +58,15 @@ object StreamingFromKafka {
     Logger.getLogger("org.eclipse.jetty.server").setLevel(Level.OFF)
     val sparkConf = new SparkConf().setAppName("DirectKafkaWordCount")
 
-    sparkConf.setMaster("local[*]")
+    sparkConf.setMaster("local[4]")
     sparkConf.set("spark.streaming.kafka.maxRatePerPartition", "2")
     sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
     val ssc = new StreamingContext(sparkConf, Seconds(2))
 
     //kafka参数
-    val kafkaParams = Map("metadata.broker.list" -> "localhost:9092",
+    val kafkaParams = Map("metadata.broker.list" -> "mq250:9092,mq221:9092,mq164:9092",
       "group.id" -> groupId,
-      "zookeeper.connect" -> "localhost:9999",
+      "zookeeper.connect" -> "mq250:2181,mq221:2181,mq164:2181",
       "auto.offset.reset" -> kafka.api.OffsetRequest.SmallestTimeString)
 
     //创建 stream 时使用的 topic 名字集合
