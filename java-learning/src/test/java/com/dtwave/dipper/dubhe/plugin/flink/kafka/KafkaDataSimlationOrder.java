@@ -18,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 import java.util.Random;
 
+
 /**
  * 模拟数据生成
  *
@@ -68,7 +69,7 @@ public class KafkaDataSimlationOrder extends BaseSimlation{
             order.setOrderTime(currentTime);
             String adsContent = new ObjectMapper().writeValueAsString(order);
             System.out.println(adsContent);
-            ProducerRecord<String,String> adsProduceRecord = new ProducerRecord<>("deal_flow", adsContent);
+            ProducerRecord<String,String> adsProduceRecord = new ProducerRecord<>("topic_partition_3", adsContent);
             producer.send(adsProduceRecord, new Callback() {
                 @Override
                 public void onCompletion(RecordMetadata recordMetadata, Exception e) {

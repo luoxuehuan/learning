@@ -12,6 +12,7 @@
         <module>java-learning</module>
         <module>scala-learing</module>
         <module>spark-learning</module>
+        <module>common</module>
     </modules>
 
     <properties>
@@ -30,6 +31,11 @@
     <dependencyManagement>
         <dependencies>
 
+            <dependency>
+                <groupId>com.hulb</groupId>
+                <artifactId>common</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>

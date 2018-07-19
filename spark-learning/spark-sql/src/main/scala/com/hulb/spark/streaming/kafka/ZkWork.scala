@@ -8,6 +8,7 @@ import org.apache.zookeeper.ZooDefs.Ids
 import org.apache.zookeeper.{CreateMode, WatchedEvent, Watcher, ZooKeeper}
 
 object ZkWork {
+
   val TIME_OUT = 5000000
   var zooKeeper: ZooKeeper = _
 
@@ -22,19 +23,24 @@ object ZkWork {
     * 连接zk,创建znode,更新znode
     */
   def connect() {
-    println(s"[ ZkWork ] zk connect")
+    //println(s"[ ZkWork ] zk connect")
     zooKeeper = new ZooKeeper("mq250:2181,mq164:2181,mq221:2181", TIME_OUT, watcher)
   }
 
   def znodeCreate(znode: String, data: String) {
-    println(s"[ ZkWork ] zk create /$znode , $data")
+    //println(s"[ ZkWork ] zk create /$znode , $data")
     zooKeeper.create(s"/$znode", data.getBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT)
   }
 
 
   def znodeDataSet(znode: String, data: String) {
-    println(s"[ ZkWork ] zk data set /$znode")
-    zooKeeper.setData(s"/$znode", data.getBytes(), -1)
+    //println(s"[ ZkWork ] zk data set /$znode")
+    try{
+      zooKeeper.setData(s"/$znode", data.getBytes(), -1)
+    }catch {
+      case _ : Exception => println(" znodeDataSet exception")
+    }
+
   }
 
   /** ***************************************************************************************************************
@@ -55,7 +61,7 @@ object ZkWork {
 
   def znodeIsExists(znode: String): Boolean ={
     connect()
-    println(s"[ ZkWork ] zk znode is exists /$znode")
+    //println(s"[ ZkWork ] zk znode is exists /$znode")
     zooKeeper.exists(s"/$znode", true) match {
       case null => false
       case _ => true
@@ -64,20 +70,24 @@ object ZkWork {
 
   def znodeIsCountChild(znode: String): util.List[String] ={
     connect()
-    println(s"[ ZkWork ] zk znode is exists /$znode")
+    //println(s"[ ZkWork ] zk znode is exists /$znode")
     val childs = zooKeeper.getChildren(s"/$znode", true)
     childs
   }
 
   def offsetWork(znode: String, data: String) {
-    connect()
-    println(s"[ ZkWork ] offset work /$znode")
-    zooKeeper.exists(s"/$znode", true) match {
-      case null => znodeCreate(znode, data)
-      case _ => znodeDataSet(znode, data)
+    try {
+      connect()
+     //println(s"[ ZkWork ] offset work /$znode")
+      zooKeeper.exists(s"/$znode", true) match {
+        case null => znodeCreate(znode, data)
+        case _ => znodeDataSet(znode, data)
+      }
+      println(s"[ ZkWork ] zk close★★★")
+      zooKeeper.close()
+    } catch {
+      case _: Exception =>
     }
-    println(s"[ ZkWork ] zk close★★★")
-    zooKeeper.close()
   }
 
 
