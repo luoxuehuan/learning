@@ -23,9 +23,6 @@ import java.util.UUID
 import com.alibaba.fastjson.JSON
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.streaming.Trigger
-import org.apache.spark.sql.types.{DataTypes, StructField, StructType}
-
-import scala.collection.mutable
 
 
 /**
@@ -65,7 +62,7 @@ import scala.collection.mutable
   * TODO 动态A join 静态B  生成临时表C 临时表C 写入到mysql中 。再用临时表C 再 join 静态表D 。生成临时表E。
   *
   */
-object StaticJoinDynamicData {
+object MutiJoinDynamicData {
   def main(args: Array[String]): Unit = {
 
     val checkpointLocation =
@@ -90,7 +87,23 @@ object StaticJoinDynamicData {
       }
     spark.sqlContext.udf.register("jsonFrom", jsonFrom)
 
-    val lines = spark
+    /**
+
+      {
+      "appName":"xxx",
+      "master":"yarn",
+      "
+
+    }
+
+
+
+
+
+      */
+
+
+    spark
       .readStream
       .format("kafka")
       .option("kafka.bootstrap.servers", "mq250:9092,mq221:9092,mq164:9092")
@@ -101,12 +114,26 @@ object StaticJoinDynamicData {
       .toDF("offset", "value")
       .selectExpr("jsonFrom(value,'proName')",
         "jsonFrom(value,'_id')")
-      .toDF("value", "id")
+      .toDF("orders_value", "orders_id").createOrReplaceTempView("orders")
+
+    val lines2 = spark
+      .readStream
+      .format("kafka")
+      .option("kafka.bootstrap.servers", "mq250:9092,mq221:9092,mq164:9092")
+      .option("subscribe", "test_click")
+      .option("groupId", "group-id-2")
+      .load()
+      .selectExpr("CAST(offset AS STRING)", "CAST(value AS STRING)")// 没有转换则是字节数组
+      .toDF("offset", "value")
+      .selectExpr("jsonFrom(value,'proName')",
+        "jsonFrom(value,'_id')")
+      .toDF("value", "id").createOrReplaceTempView("test_click")
     // .withWatermark("timestamp", "10 seconds")
 
     spark.sql("set spark.sql.crossJoin.enabled=true")
     //TODO 1.如何刷新这个动态表
     val staticTable = spark.sql("select * from source")
+    staticTable.createOrReplaceTempView("source")
     staticTable.show()
 
     //TODO 2.如何JOIN多个表 （5个动态，3个静态）
@@ -115,10 +142,32 @@ object StaticJoinDynamicData {
       * 这里注意join的限制。2.0 开始可以动态join 静态
       * 2.2开始可以动态join 动态。
       */
-    val out = lines.join(staticTable, lines("id") === staticTable("source_key"), "inner")
+    //val out = lines.join(staticTable, lines("id") === staticTable("source_key"), "inner")
+
+
+    //val out2 = spark.sql("select * from test_click join source on test_click.id = source.source_key")
+    spark.sql("select * from test_click join orders on test_click.id = orders.orders_id")
+      .createOrReplaceTempView("temp_join_result")
+
+
+    val resultOutput = spark.sql("select * from temp_join_result join source on temp_join_result.id = source.source_key")
+
+
 
     //TODO 3.高效写回到mysql中。 且保证exactly-once 语义。
-    val output = out.selectExpr("value").writeStream
+//    val output = out.selectExpr("value").writeStream
+//      .format("kafka")
+//      .outputMode("append")
+//      .option("kafka.bootstrap.servers", "mq250:9092,mq221:9092,mq164:9092")
+//      .option("topic", "result")
+//      .option("checkpointLocation", checkpointLocation)
+//
+//      //.trigger(Trigger.Continuous("1 second")) // only change in query
+//      .trigger( Trigger.ProcessingTime("1 seconds")) // only change in query
+//      //.start()
+
+
+    val output2 = resultOutput.selectExpr("concat(id, orders_id) as value").writeStream
       .format("kafka")
       .outputMode("append")
       .option("kafka.bootstrap.servers", "mq250:9092,mq221:9092,mq164:9092")
@@ -129,9 +178,16 @@ object StaticJoinDynamicData {
       .trigger( Trigger.ProcessingTime("1 seconds")) // only change in query
       .start()
 
-    output.awaitTermination()
+   // output.awaitTermination()
+    output2.awaitTermination()
   }
 
 }
 
+/**
+  *
+  *
+  * kafka-console-consumer.sh --bootstrap-server mq250:9092,mq221:9092,mq164:9092  --topic orders
+  */
 // scalastyle:on println
+

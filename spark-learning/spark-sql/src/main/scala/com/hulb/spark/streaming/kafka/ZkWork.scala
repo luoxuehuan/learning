@@ -24,7 +24,7 @@ object ZkWork {
     */
   def connect() {
     //println(s"[ ZkWork ] zk connect")
-    zooKeeper = new ZooKeeper("mq250:2181,mq164:2181,mq221:2181", TIME_OUT, watcher)
+    zooKeeper = new ZooKeeper("localhost:2181", TIME_OUT, watcher)
   }
 
   def znodeCreate(znode: String, data: String) {

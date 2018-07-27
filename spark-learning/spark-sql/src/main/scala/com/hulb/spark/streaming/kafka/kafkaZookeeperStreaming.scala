@@ -1,6 +1,9 @@
 package com.hulb.spark.streaming.kafka
 
 import com.alibaba.fastjson.JSON
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
+import org.apache.curator.framework.CuratorFrameworkFactory
+import org.apache.curator.retry.RetryNTimes
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.spark.sql.SparkSession
@@ -9,15 +12,17 @@ import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
 import org.apache.spark.streaming.kafka010.{CanCommitOffsets, HasOffsetRanges, KafkaUtils, OffsetRange}
 import org.apache.spark.{SparkConf, SparkContext, TaskContext}
 import org.apache.spark.streaming.{Milliseconds, Seconds, StreamingContext}
+import org.spark_project.jetty.server.{Request, Server}
+import org.spark_project.jetty.server.handler.{AbstractHandler, ContextHandler}
 
 //import com.dtwave.dipper.dubhe.plugin.flink.kafka.Order;
 
 
-case class Order(_id: Long,
-                 orderId: Long,
-                 proName: String,
-                 amount: Integer,
-                 orderTime: Long)
+//case class Order(_id: Long,
+//                 orderId: Long,
+//                 proName: String,
+//                 amount: Integer,
+//                 orderTime: Long)
 
 /**
   * @author hulb
@@ -36,7 +41,7 @@ object kafkaZookeeperStreaming {
       */
     //val Array(output, topic, broker, group, sec) = args
     val output = "/tmp/streaming/"
-    val topic = "topic_partition_3"
+    val topic = "topic_partition_4"
     val broker = "mq250:9092,mq221:9092,mq164:9092"
     val group = "group-1"
     val sec = "2000"
@@ -53,7 +58,14 @@ object kafkaZookeeperStreaming {
 
     val sc = spark.sparkContext
     val ssc = new StreamingContext(sc, Milliseconds(sec.toInt))
+    daemonHttpServer(5566,ssc)
+   // daemonHttpServer2(5567,ssc)
     sc.setLogLevel("WARN")
+
+    /**
+      * 使用curator来进行zk操作
+      */
+
 
     //topic 这里是一个数组。可以同时订阅多个topic。
     val topics = Array(topic)
@@ -102,14 +114,8 @@ object kafkaZookeeperStreaming {
 
     var start = true;
     //val stream =  KafkaUtils.createDirectStream[String, String](ssc, PreferConsistent, Subscribe[String, String](topics, kafkaParams))
-    val stream = if(start && false) {
-      //手动指定 了offset。
-      val offsetList = List((topic, 0, 123L),(topic, 1, 233L),(topic, 2, 233L))                          //指定topic，partition_no，offset
-      val newOffset = setFromOffsets(offsetList)
-      start = false;
-      KafkaUtils.createDirectStream[String, String](ssc, PreferConsistent, Subscribe[String, String](topics, kafkaParams, newOffset))
-    } else if (zk.znodeIsExists(s"${topic}_offset/$group")) {
-
+    val stream = if (zk.znodeIsExists(s"${topic}_offset/$group")) {
+      //TODO 这里只有第一次启动的时候会去调用。之后不会调用。
       var newOffset: Map[TopicPartition, Long] = Map()
       val childCount = zk.znodeIsCountChild(s"${topic}_offset/$group").size()
       for (i <- 0 until childCount) {
@@ -117,13 +123,13 @@ object kafkaZookeeperStreaming {
         newOffset += (new TopicPartition(nor(0).toString, nor(1).toInt) -> nor(2).toLong)
         //val newOffset = Map(new TopicPartition(nor(0).toString, nor(1).toInt) -> nor(2).toLong)//创建以topic，分区为k 偏移度为v的map
 
-        println(
-          s"""
-             |--------------------------------------------------------------------
-             |topic ${nor(0).toString},Partition ${nor(1).toInt},offset ${nor(2).toLong}
-             |zk中取出来的kafka偏移量★★★ $newOffset
-             |--------------------------------------------------------------------
-          """.stripMargin)
+//        println(
+//          s"""
+//             |--------------------------------------------------------------------
+//             |topic ${nor(0).toString},Partition ${nor(1).toInt},offset ${nor(2).toLong}
+//             |zk中取出来的kafka偏移量★★★ $newOffset
+//             |--------------------------------------------------------------------
+//          """.stripMargin)
       }
       // TODO 注意kafka 内部会自己覆盖groupId 导致之前设置的groupId出问题。需要覆盖这个方法。val groupId = "spark-executor-" + originalGroupId
       // TODO 要把保存的offset 和 earliest 和latest对比，反之outOfRange
@@ -174,18 +180,23 @@ object kafkaZookeeperStreaming {
         //TODO rdd -> DF -> SQL // kafka 数据是json的。 直接转为df 方便。log4j 如何打json日志。
 
         rdd.foreachPartition {
+//          val retryPolicy = new RetryNTimes(5,1000)
+//          val framework = CuratorFrameworkFactory.newClient("127.0.0.1:2181", retryPolicy)
+//          framework.start
           iter =>
 
             //println(iter)
             val o: OffsetRange = offsetRanges(TaskContext.get.partitionId)
-//            println(
-//              s"""
-//                 |--------------------------------------------------------------------
-//                 |[ kafkaZookeeperStreaming ]  topic: ${o.topic},partition: ${o.partition},
-//                 |fromOffset 开始偏移量: ${o.fromOffset} untilOffset 结束偏移量: ${o.untilOffset}
-//                 |需要保存的偏移量,供下次读取使用
-//                 |--------------------------------------------------------------------
-//               """.stripMargin)
+            println(
+              s"""
+                 |--------------------------------------------------------------------
+                 |[ kafkaZookeeperStreaming ]  topic: ${o.topic},partition: ${o.partition},
+                 |fromOffset 开始偏移量: ${o.fromOffset} untilOffset 结束偏移量: ${o.untilOffset}
+                 |需要保存的偏移量,供下次读取使用
+                 |--------------------------------------------------------------------
+               """.stripMargin)
+
+           // framework.setData().forPath(s"${o.topic}_offset/$group/${o.partition}",s"${o.topic},${o.partition},${o.untilOffset}".getBytes)
            zk.offsetWork(s"${o.topic}_offset/$group/${o.partition}", s"${o.topic},${o.partition},${o.untilOffset}")
         }
 
@@ -210,6 +221,66 @@ object kafkaZookeeperStreaming {
       fromOffsets += (tp -> offset._3)           // offset位置
     }
     fromOffsets
+  }
+
+  /****
+    * 负责启动守护的jetty服务
+    * @param port 对外暴露的端口号
+    * @param ssc Stream上下文
+    */
+  def daemonHttpServer(port:Int,ssc: StreamingContext)={
+    val server=new Server(port)
+    val context = new ContextHandler();
+    context.setContextPath( "/close" );
+    context.setHandler( new CloseStreamHandler(ssc) )
+    server.setHandler(context)
+    server.start()
+  }
+
+  /****
+    * 负责启动守护的jetty服务
+    * @param port 对外暴露的端口号
+    * @param ssc Stream上下文
+    */
+  def daemonHttpServer2(port:Int,ssc: StreamingContext)={
+    val server=new Server(port)
+    val restartContext = new ContextHandler();
+    restartContext.setContextPath( "/restart" );
+    restartContext.setHandler( new RestartStreamHandler(ssc) )
+    server.setHandler(restartContext)
+    server.start()
+  }
+
+  /*** 负责接受http请求来优雅的关闭流
+    * @param ssc  Stream上下文
+    */
+  class CloseStreamHandler(ssc:StreamingContext) extends AbstractHandler {
+    override def handle(s: String, baseRequest: Request, req: HttpServletRequest, response: HttpServletResponse): Unit ={
+      println("开始关闭......")
+      ssc.stop(false,true)//优雅的关闭
+      response.setContentType("text/html; charset=utf-8");
+      response.setStatus(HttpServletResponse.SC_OK);
+      val out = response.getWriter();
+      out.println("close success");
+      baseRequest.setHandled(true);
+      println("关闭成功.....")
+    }
+  }
+
+  /*** 负责接受http请求来优雅的关闭流
+    * @param ssc  Stream上下文
+    */
+  class RestartStreamHandler(ssc:StreamingContext) extends AbstractHandler {
+    override def handle(s: String, baseRequest: Request, req: HttpServletRequest, response: HttpServletResponse): Unit ={
+      println("开始重启......")
+      ssc.start//优雅的关闭
+      response.setContentType("text/html; charset=utf-8");
+      response.setStatus(HttpServletResponse.SC_OK);
+      val out = response.getWriter();
+      out.println("restart success");
+      baseRequest.setHandled(true);
+      println("重启成功.....")
+    }
   }
 
 }

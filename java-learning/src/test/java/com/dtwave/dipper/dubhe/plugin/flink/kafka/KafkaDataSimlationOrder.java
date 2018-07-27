@@ -63,13 +63,14 @@ public class KafkaDataSimlationOrder extends BaseSimlation{
             String id  = getRandom(1,3);
             order.set_id(Long.valueOf(id));
             order.setOrderId(Integer.toUnsignedLong(i));
-            order.setProName("prt_upsert_37_______"+id);
+            order.setProName("prt_order_upsert_37_______"+i);
             order.setAmount(1);
             long currentTime=System.currentTimeMillis();
             order.setOrderTime(currentTime);
             String adsContent = new ObjectMapper().writeValueAsString(order);
             System.out.println(adsContent);
-            ProducerRecord<String,String> adsProduceRecord = new ProducerRecord<>("topic_partition_3", adsContent);
+            //ProducerRecord<String,String> adsProduceRecord = new ProducerRecord<>("spark_kafka_1", adsContent);
+            ProducerRecord<String,String> adsProduceRecord = new ProducerRecord<>("orders", adsContent);
             producer.send(adsProduceRecord, new Callback() {
                 @Override
                 public void onCompletion(RecordMetadata recordMetadata, Exception e) {
@@ -80,7 +81,7 @@ public class KafkaDataSimlationOrder extends BaseSimlation{
                     }
                 }
             });
-            Thread.sleep(1000L);
+            Thread.sleep(2000L);
         }
     }
 

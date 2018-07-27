@@ -57,7 +57,7 @@ public class KafkaDataSimlationClick extends BaseSimlation{
             Click click=new Click();
             click.set_id(Long.valueOf(getRandom(1,3)));
             click.setProductId(Integer.toUnsignedLong(i));
-            click.setProName("prt_upsert_37_______"+Math.floorMod(i,5));
+            click.setProName("prt_click_upsert_37_______"+i);
             long currentTime=System.currentTimeMillis();
             click.setClickTIme(currentTime);
             String adsContent = new ObjectMapper().writeValueAsString(click);
