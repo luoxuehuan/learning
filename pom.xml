@@ -13,6 +13,7 @@
         <module>scala-learing</module>
         <module>spark-learning</module>
         <module>common</module>
+        <module>hadoop-learning</module>
     </modules>
 
     <properties>
@@ -26,6 +27,8 @@
         <odps.version>0.20.7-public</odps.version>
         <oss.sdk.version>2.2.0</oss.sdk.version>
         <jackson.version>1.9.13</jackson.version>
+        <hadoop.version>2.6.0</hadoop.version>
+        <elasticsearch.version>6.4.2</elasticsearch.version>
     </properties>
 
     <dependencyManagement>
@@ -40,6 +43,18 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${junit.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-common</artifactId>
+                <version>${hadoop.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-client</artifactId>
+                <version>${hadoop.version}</version>
             </dependency>
 
             <dependency>

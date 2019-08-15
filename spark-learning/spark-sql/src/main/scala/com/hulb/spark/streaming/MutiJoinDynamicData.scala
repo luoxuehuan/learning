@@ -89,12 +89,60 @@ object MutiJoinDynamicData {
 
     /**
 
+    {
+  "your-fist-ss-job": {
+    "desc": "测试",
+    "strategy": "spark",
+    "algorithm": [],
+    "ref": [
+    ],
+    "compositor": [
       {
-      "appName":"xxx",
-      "master":"yarn",
-      "
-
+        "name": "ss.sources",
+        "params": [
+          {
+            "format": "kafka9",
+            "outputTable": "test",
+            "kafka.bootstrap.servers": "127.0.0.1:9092",
+            "topics": "test",
+            "path": "-"
+          },
+          {
+            "format": "com.databricks.spark.csv",
+            "outputTable": "sample",
+            "header": "true",
+            "path": "/Users/allwefantasy/streamingpro/sample.csv"
+          }
+        ]
+      },
+      {
+        "name": "ss.sql",
+        "params": [
+          {
+            "sql": "select city as value from test left join sample on  CAST(test.value AS String) == sample.name",
+            "outputTableName": "test3"
+          }
+        ]
+      },
+      {
+        "name": "ss.outputs",
+        "params": [
+          {
+            "mode": "append",
+            "format": "kafka8",
+            "metadata.broker.list":"127.0.0.1:9092",
+            "topics":"test2",
+            "inputTableName": "test3",
+            "checkpoint":"/tmp/ss-kafka/",
+            "path": "/tmp/ss-kafka-data"
+          }
+        ]
+      }
+    ],
+    "configParams": {
     }
+  }
+}
 
 
 
@@ -112,9 +160,17 @@ object MutiJoinDynamicData {
       .load()
       .selectExpr("CAST(offset AS STRING)", "CAST(value AS STRING)")// 没有转换则是字节数组
       .toDF("offset", "value")
-      .selectExpr("jsonFrom(value,'proName')",
-        "jsonFrom(value,'_id')")
-      .toDF("orders_value", "orders_id").createOrReplaceTempView("orders")
+      .createOrReplaceTempView("source_orders")
+
+      spark.sql(
+        """
+          |select jsonFrom(value,'proName') as orders_value,jsonFrom(value,'_id') as orders_id from source_orders
+        """.stripMargin).createOrReplaceTempView("orders")
+
+
+//      .selectExpr("jsonFrom(value,'proName')",
+//        "jsonFrom(value,'_id')")
+//      .toDF("orders_value", "orders_id").createOrReplaceTempView("orders")
 
     val lines2 = spark
       .readStream
