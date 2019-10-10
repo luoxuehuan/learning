@@ -147,7 +147,8 @@ public class DeepFirstSort {
             TreeNode node=myQueue.poll();
             System.out.print(node.data+" ");
             if(null!=node.leftNode) {
-                myQueue.add(node.leftNode);    //深度优先遍历，我们在这里采用每一行从左到右遍历
+                //深度优先遍历，我们在这里采用每一行从左到右遍历
+                myQueue.add(node.leftNode);
             }
             if(null!=node.rightNode) {
                 myQueue.add(node.rightNode);
@@ -161,7 +162,9 @@ public class DeepFirstSort {
      * @param root
      */
     public static void preOrder(TreeNode root){
-        if(root == null) return;
+        if(root == null) {
+            return;
+        }
         System.out.print(root.data + " ");
         preOrder(root.leftNode);
         preOrder(root.rightNode);
@@ -185,7 +188,9 @@ public class DeepFirstSort {
      * @param root
      */
     public static void postOrder(TreeNode root){
-        if(root == null) return;
+        if(root == null) {
+            return;
+        }
         postOrder(root.leftNode);
         postOrder(root.rightNode);
         System.out.print(root.data + " ");
@@ -214,6 +219,7 @@ public class DeepFirstSort {
 
     /**
      * 非递归方法实现中序遍历，并打印
+     * 1，2，4 接连入栈。4先出栈，但1 比 2 先入栈 2 先出栈 。然后遍历2的右节点。
      * @param root
      */
     public static void inOrder2(TreeNode root){
@@ -240,12 +246,16 @@ public class DeepFirstSort {
         TreeNode currentRoot = root;
         TreeNode rightRoot = null;
         while (currentRoot != null || !stack.isEmpty()){
+            //递归找到最左边的节点
             while (currentRoot != null){
                 stack.push(currentRoot);
                 currentRoot = currentRoot.leftNode;
             }
+            //如果找不到最左边的节点的话，就把该节点弹出来
             currentRoot = stack.pop();
-            //当前节点没有右节点或上一个结点（已经输出的结点）是当前结点的右结点，则输出当前结点
+            //当前节点没有右节点   或   上一个结点（已经输出的结点）是当前结点的右结点，
+            // 则输出当前结点（当5输出后，5就是2的右结点，也是上一个结点，
+            // 所以此时可以把2这个root输出了）
             while (currentRoot.rightNode == null || currentRoot.rightNode == rightRoot){
                 System.out.print(currentRoot.data + " ");
                 rightRoot = currentRoot;
@@ -254,7 +264,8 @@ public class DeepFirstSort {
                 }
                 currentRoot = stack.pop();
             }
-            stack.push(currentRoot);//还有未遍历的右侧节点
+            //还有未遍历的右侧节点
+            stack.push(currentRoot);
             currentRoot = currentRoot.rightNode;
         }
     }
