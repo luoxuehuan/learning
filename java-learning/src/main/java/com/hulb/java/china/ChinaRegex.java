@@ -18,33 +18,33 @@ import java.util.regex.Pattern;
  */
 public class ChinaRegex {
 
-    public static void main(String[] args) throws Exception {
-        replace();
-    }
+
+
+
+
 
     public static void test1() throws Exception {
         List<String> lines = FileUtil.lines("/Users/hulb/data/csv/international.txt");
         Long d = 300001010L;
         for (Long i = 0L; i < lines.size(); i++) {
-            System.out.println(d + i);
-            //System.out.print("=");
-            //System.out.println(lines.get(Integer.valueOf(String.valueOf(i))));
+            System.out.print(d + i);
+            System.out.print("=");
+            System.out.println(lines.get(Integer.valueOf(String.valueOf(i))));
         }
 
     }
 
 
     public static void test2() throws Exception {
-        List<String> lines = FileUtil.lines("/Users/hulb/data//china.txt");
+        List<String> lines = FileUtil.lines("/Users/hulb/data/csv/replace.txt");
         String className = "";
         for (String line : lines) {
-            if (line.contains("java") && line.contains("/")) {
-                String[] li = line.split("/");
-                className = li[li.length - 1];
-                className = className.split("\\.")[0];
-                // System.out.println("------------------------------------------------------------------------"+className);
+            if (line.contains("pom.xml") && line.contains("/")) {
+                //System.out.println("------------------------------------------------------------------------"+className);
+                System.out.println(line.replace(":",""));
             }
-            test3(line, className);
+            replace(line,"1.1.0-SNAPSHOT","1.1.3-SNAPSHOT");
+           // test3(line, className);
         }
     }
 
@@ -92,6 +92,41 @@ public class ChinaRegex {
             stringBuffer.append(ss);
             stringBuffer.append("\n");
         });
+        //将替换好的line写回到原来的文件中
+        try {
+            BufferedWriter out = new BufferedWriter(new FileWriter(fileName, false));
+            out.write(stringBuffer.toString());
+            out.close();
+        } catch (IOException e) {
+        }
+    }
+
+    /**
+     * 将中文替换成编码
+     *
+     * @throws Exception
+     */
+    public static void replace( String fileName,String old,String news) throws Exception {
+
+        List<String> lines = FileUtil.lines(fileName);
+        StringBuffer stringBuffer = new StringBuffer();
+        for (int i = 0; i < lines.size(); i++) {
+            String newLine = lines.get(i);
+            if (newLine.contains(old)) {
+                System.out.println("要替换的中文:================" + newLine);
+                newLine = newLine.replace(old, news);
+            }
+            lines.set(i, newLine);
+
+            stringBuffer.append(newLine);
+            if(i < lines.size()-1){
+                stringBuffer.append("\n");
+            }
+        }
+
+//        System.out.println(stringBuffer.toString());
+//        System.out.println(stringBuffer.toString());
+
         //将替换好的line写回到原来的文件中
         try {
             BufferedWriter out = new BufferedWriter(new FileWriter(fileName, false));

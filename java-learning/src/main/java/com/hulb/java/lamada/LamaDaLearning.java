@@ -12,6 +12,9 @@ import java.util.stream.Collectors;
 public class LamaDaLearning {
 
     public static void main(String[] args) {
+
+
+        System.out.println(System.currentTimeMillis()/1000);
         list2list();
         list2map();
     }
@@ -40,6 +43,7 @@ public class LamaDaLearning {
         //map.forEach(System.out::println);
     }
 }
+
 
 
 class Abc {
