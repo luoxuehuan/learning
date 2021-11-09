@@ -7,7 +7,7 @@
     </property>
     <property>
         <name>hive.metastore.warehouse.dir</name>
-        <value>/user/hive/warehouse</value>
+        <value>hdfs://localhost:9000/user/hive234/warehouse</value>
     </property>
     <property>
         <name>hive.exec.scratchdir</name>
@@ -18,5 +18,11 @@
         <name>hive.exec.dynamic.partition.mode</name>
         <value>nonstrict</value>
     </property>
+
+    <!-- <property>
+      <name>hive.security.authorization.enabled</name>
+      <value>true</value>
+      <description>enable or disable the hive clientauthorization</description>
+  </property> -->
 
 </configuration>
