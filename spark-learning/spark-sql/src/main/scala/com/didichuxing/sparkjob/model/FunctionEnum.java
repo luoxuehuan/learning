@@ -38,6 +38,10 @@ public enum FunctionEnum {
     NOT_NULL_MAX(205, "最小值", "not_null_max","2",2,"max(columnName)","columnName is not null ",1),
 
 
+    GROUP_BY_DISTINCT(301, "数据分布", "group_by_distinct","3",3,"columnName,count(1) as columnName_count","group by columnName  order by columnName_count desc limit 5",1),
+    DIS(401, "数据分布", "group_by_distinct","3",4,"columnName,count(1) as columnName_count","group by columnName  order by columnName_count desc limit 5",1),
+
+
     ;
 
 

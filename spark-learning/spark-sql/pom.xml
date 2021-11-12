@@ -142,6 +142,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.didichuxing.datamap</groupId>
+            <artifactId>fast-json</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
             <version>2.10.5</version>
@@ -157,6 +163,10 @@
             <groupId>org.apache.curator</groupId>
             <artifactId>curator-recipes</artifactId>
             <version>2.12.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.dtwave</groupId>
+            <artifactId>common</artifactId>
         </dependency>
 
 
