@@ -22,7 +22,7 @@
 
     <properties>
         <scala.version>2.11.8</scala.version>
-        <spark.version>2.3.1</spark.version>
+        <spark.version>2.4.7</spark.version>
         <junit.version>4.13.1</junit.version>
         <fastjson.version>1.2.25.sec10</fastjson.version>
         <elasticsearch.version>5.0.0</elasticsearch.version>
