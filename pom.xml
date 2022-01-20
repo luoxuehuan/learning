@@ -16,6 +16,8 @@
         <module>spark-learning</module>
         <module>flink-learning</module>
         <module>kafka-learning</module>
+        <module>spark-learning/spark-iceberg</module>
+        <module>spark-learning/spark-hudi</module>
     </modules>
 
     <properties>

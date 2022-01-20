@@ -1,7 +1,5 @@
 package com.didichuxing.sparkjob.main
 
-import com.didichuxing.sparkjob.exec.ExecBucket
-import com.didichuxing.sparkjob.util.{JsonUtils, SparkUtils}
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.storage.StorageLevel
 
@@ -26,6 +24,12 @@ object DataSearchTest {
     val taskConfigString = JsonUtils.parseToJsonString(MockData.getTaskConfig())
     val task = JsonUtils.parseToTask(taskConfigString)
     spark.sparkContext.setLogLevel("error")
+
+
+
+
+
+
     //两种结构 全部铺平
     // 按字段聚合结构
     // key1 = column
@@ -42,6 +46,7 @@ object DataSearchTest {
       * 第六步 结果发送回地图或存储到ES中
       */
     val partitionDataFrame = spark.sql(s"select * from ${dataAnalyse.getStorageName} where ${dataAnalyse.getPartitionName}")
+    partitionDataFrame.show()
     partitionDataFrame.persist(StorageLevel.MEMORY_AND_DISK).createTempView("tempTable")
     val sqlList = SparkUtils.getScalaExecSqlList("tempTable", dataAnalyse)
     val distributionList = SparkUtils.getScalaExecDisList("tempTable", dataAnalyse)
@@ -62,7 +67,8 @@ object DataSearchTest {
           val value = javaRow.get(sqlList.get(j).columnName+"_count")
           distribution.put(key,value)
         }
-        dataDistribution.put(sqlList.get(j).columnName+"_distribution",distribution)
+        //dataDistribution.put(sqlList.get(j).columnName+"_distribution",distribution)
+        dataDistribution.put(sqlList.get(j).columnName,distribution)
       }else{
         for (row <- resultMapList) {
           val javaRow = row.asJava
@@ -73,20 +79,29 @@ object DataSearchTest {
     }
     //println(javaMap)
     println(dataDistribution)
-    val map = transFromMapGroupByColumnName(javaMap)
+    val basicMap = transFromMapGroupByColumnName(javaMap)
 
+    val dataDistributionListMap = new util.HashMap[String,Object]()
+    //计算需要计算字段的等距分布
     for (j <- 0 to distributionList.size() - 1) {
       val column = distributionList.get(j).columnName
-      val min = map.get(column).get("min")
-      val max = map.get(column).get("max")
+      val min = basicMap.get(column).get("min")
+      val max = basicMap.get(column).get("max")
       val minDouble = min.toDouble
       val maxDouble = max.toDouble
-      ExecBucket.bucket(spark,"tempTable",column,minDouble,maxDouble)
+      val columnDistribution = ExecBucket.bucket(spark,"tempTable",column,minDouble,maxDouble)
+      dataDistributionListMap.put(column,columnDistribution)
     }
 
 
-    JsonUtils.parseToJsonObject(map)
-    JsonUtils.parseToJsonObject(dataDistribution)
+    val allMap = new util.HashMap[String,Object]()
+
+    allMap.put("basic",basicMap)
+    allMap.put("dataValueDistribution",dataDistribution)
+    allMap.put("dataRangeDistribution",dataDistributionListMap)
+
+    JsonUtils.parseToJsonObject(allMap)
+    //JsonUtils.parseToJsonObject(dataDistribution)
   }
 
 

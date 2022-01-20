@@ -20,7 +20,7 @@ object SparkTest2 {
 
     import spark.implicits._
     var dataBase = "data_search_test"
-    var tableName = "test_table_0"
+    var tableName = "test_table_tt_0"
     var startDay = 0
     var endDay = 4
     var recordEveryDay = 10

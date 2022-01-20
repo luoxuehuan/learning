@@ -1,15 +1,11 @@
-package com.didichuxing.sparkjob.util
+package com.didichuxing.sparkjob.main
 
-import com.didichuxing.sparkjob.model.{AnalyseColumnConfig, DataAnalyseCreateDTO, FunctionEnum}
+import com.didichuxing.sparkjob.model.{DataAnalyseCreateDTO, FunctionEnum}
 import org.apache.commons.lang3.StringUtils
-import org.apache.spark.sql.{DataFrame, Dataset, Row}
+import org.apache.spark.sql.DataFrame
 
-import java.util
-import java.util.List
-import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
-import scala.collection.immutable
 import scala.collection.JavaConversions._
+import scala.collection.mutable
 
 
 object SparkUtils {
@@ -114,7 +110,6 @@ object SparkUtils {
     * 7.null值数 nullCount
     * 8.零值数 zeroCount
     *
-    *
     * --- 基础统计
     * 记录数count
     * 空值数count is null
@@ -182,21 +177,6 @@ object SparkUtils {
         }
       }
     }
-    //    val columnSql = new StringBuffer()
-    //    for(j <- 0 to functionColumnList.size()-1){
-    //      if(columnSql.length() == 0){
-    //        columnSql.append(functionColumnList.get(j))
-    //      }else{
-    //        columnSql.append(",").append(functionColumnList.get(j))
-    //      }
-    //    }
-    //    val result = columnSql.toString
-    //    val sql =
-    //      s"""
-    //         |select $result from $tempTableName
-    //         |""".stripMargin
-    //
-    //    sqlList.add(sql)
     sqlList
   }
 

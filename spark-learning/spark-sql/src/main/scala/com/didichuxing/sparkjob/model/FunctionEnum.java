@@ -25,22 +25,21 @@ import java.util.List;
 public enum FunctionEnum {
 
     COUNT(101, "记录数", "count","1",1,"count(columnName)","",1),
-    NULL_COUNT(102, "记录数", "null_count","2",1,"count(columnName)","columnName is null",1),
-    NULL_COUNT_PERCENT(103, "记录数", "null_count_percent","2",1,"count(columnName)/count(1)","columnName is null",1),
+    NULL_COUNT(102, "空值数", "null_count","2",1,"count(columnName)","columnName is null",1),
+    NULL_COUNT_PERCENT(103, "空值率", "null_count_percent","2",1,"count(columnName)/count(1)","columnName is null",1),
     MIN(104, "最小值", "min","1",1,"min(columnName)","",1),
     MAX(105, "最小值", "max","1",1,"max(columnName)","",1),
 
 
-    ONLY(201, "最小值", "only","2",2,"count(distinct columnName)","",1),
-    AVG(202, "最小值", "avg","2",2,"avg(columnName)","",1),
-    VAR_POP(203, "最小值", "avg","2",2,"var_pop(columnName)","",1),
+    ONLY(201, "唯一值", "only","2",2,"count(distinct columnName)","",1),
+    AVG(202, "平均值", "avg","2",2,"avg(columnName)","",1),
+    VAR_POP(203, "方差", "sqrt_var_pop","2",2,"sqrt(var_pop(columnName))","",1),
     NOT_NULL_MIN(204, "最小值", "not_null_min","2",2,"min(columnName)","columnName is not null",1),
     NOT_NULL_MAX(205, "最小值", "not_null_max","2",2,"max(columnName)","columnName is not null ",1),
 
 
     GROUP_BY_DISTINCT(301, "数据分布", "group_by_distinct","3",3,"columnName,count(1) as columnName_count","group by columnName  order by columnName_count desc limit 5",1),
     DIS(401, "数据分布", "group_by_distinct","3",4,"columnName,count(1) as columnName_count","group by columnName  order by columnName_count desc limit 5",1),
-
 
     ;
 

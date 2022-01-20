@@ -7,7 +7,7 @@ object MockData {
   def getTestDataAnalyse():DataAnalyseCreateDTO = {
     val dataAnalyseCreateDTO = new DataAnalyseCreateDTO
     dataAnalyseCreateDTO.setStorageName("data_search_test.test_table_0")
-    dataAnalyseCreateDTO.setPartitionName("ds=20211102")
+    dataAnalyseCreateDTO.setPartitionName("ds=20211101")
     val  columnConfig = new AnalyseColumnConfig
     columnConfig.setColumnName("age");
     columnConfig.setColumnType("bigint")

@@ -17,14 +17,14 @@ object SparkTest {
     spark.sparkContext.setLogLevel("error")
 
     spark.sql("show databases").show(10)
-    spark.sql("select count(1) from my_test_0326.test_table").show(10)
+    //spark.sql("select count(1) from my_test_0326.test_table").show(10)
 
 
     import spark.implicits._
     var dataBase = "data_search_test"
-    var tableName = "test_table"
+    var tableName = "test_table_test"
     var start = 0
-    var end = 100
+    var end = 10
 
     if (args.length > 2) {
       dataBase = args.apply(0)
