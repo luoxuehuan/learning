@@ -31,7 +31,7 @@
         <odps.version>0.20.7-public</odps.version>
         <oss.sdk.version>2.2.0</oss.sdk.version>
         <jackson.version>1.9.13</jackson.version>
-        <hadoop.version>2.6.0</hadoop.version>
+        <hadoop.version>3.2.3</hadoop.version>
         <elasticsearch.version>6.4.2</elasticsearch.version>
     </properties>
 
